@@ -106,7 +106,13 @@ class BaseProviderTest(BaseProviderBaseTest):
         provider.launch_mock.assert_any_call()
         provider.start_mock.assert_any_call()
         provider.save_info_mock.assert_called_once_with(
-            {"data": {"base": "core16", "created-by-snapcraft-version": "4.0"}}
+            {
+                "data": {
+                    "base": "core16",
+                    "created-by-snapcraft-version": "4.0",
+                    "host-project-directory": self.project._project_dir,
+                }
+            }
         )
 
         self.assertThat(
@@ -548,6 +554,41 @@ class TestCompatibilityClean:
             dict(
                 base="core16",
                 loaded_info={"base": "core18", "created-by-snapcraft-version": "1.0"},
+                version="1.0",
+                expect_clean=True,
+            ),
+        ),
+        (
+            "same-project-dir-no-clean",
+            dict(
+                base="core18",
+                loaded_info={
+                    "base": "core18",
+                    "created-by-snapcraft-version": "1.0",
+                    "host-project-directory": os.getcwd(),
+                },
+                version="1.0",
+                expect_clean=False,
+            ),
+        ),
+        (
+            "no-project-dir-no-clean",
+            dict(
+                base="core18",
+                loaded_info={"base": "core18", "created-by-snapcraft-version": "1.0"},
+                version="1.0",
+                expect_clean=False,
+            ),
+        ),
+        (
+            "different-project-dir-clean",
+            dict(
+                base="core18",
+                loaded_info={
+                    "base": "core18",
+                    "created-by-snapcraft-version": "1.0",
+                    "host-project-directory": "/nowhere",
+                },
                 version="1.0",
                 expect_clean=True,
             ),
